@@ -1,0 +1,58 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id        String         @id @default(cuid())
+  name      String
+  email     String?        @unique
+  phone     String?
+  reference String?        // internal note / ref code
+  cpf       String?        @unique
+  walletRef String?        // optional “wallet number”
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id             String           @id @default(cuid())
+  customerId     String
+  customer       Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  type           TransactionType
+  // BRL value (cents) actually transferred in or out
+  amount_cents   Int              // + for DEPOSIT row semantics; for WITHDRAWAL store positive and use type to subtract in aggregates
+  // BTC quantity credited/debited (satoshis). For WITHDRAWAL, store positive and use type to subtract in aggregates.
+  btc_sats       BigInt
+  // Reference BRL per BTC used at the time of booking
+  price_brl_per_btc Decimal      @db.Decimal(18,2)
+  // Timestamp of the transaction (when it took effect)
+  occurredAt     DateTime         @default(now())
+
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([customerId, occurredAt])
+  @@index([occurredAt])
+  @@index([type])
+}

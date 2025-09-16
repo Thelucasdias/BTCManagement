@@ -12,7 +12,8 @@
     "check:types": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:start": "dotenv -e .env.runtime -- next start"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

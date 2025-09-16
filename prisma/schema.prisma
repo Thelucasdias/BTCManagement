@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // ...?schema=public
 }
 
 enum TransactionType {
@@ -14,43 +14,43 @@ enum TransactionType {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   passwordHash String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Customer {
-  id        String         @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
-  email     String?        @unique
+  email     String?  @unique
   phone     String?
-  reference String?        // internal note / ref code
-  cpf       String?        @unique
-  walletRef String?        // optional “wallet number”
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  reference String?
+  cpf       String?  @unique
+  walletRef String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // deletedAt  DateTime?     // se optar por soft delete
 
   transactions Transaction[]
 }
 
 model Transaction {
-  id             String           @id @default(cuid())
-  customerId     String
-  customer       Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  type           TransactionType
-  // BRL value (cents) actually transferred in or out
-  amount_cents   Int              // + for DEPOSIT row semantics; for WITHDRAWAL store positive and use type to subtract in aggregates
-  // BTC quantity credited/debited (satoshis). For WITHDRAWAL, store positive and use type to subtract in aggregates.
-  btc_sats       BigInt
-  // Reference BRL per BTC used at the time of booking
-  price_brl_per_btc Decimal      @db.Decimal(18,2)
-  // Timestamp of the transaction (when it took effect)
-  occurredAt     DateTime         @default(now())
+  id         String          @id @default(cuid())
+  customerId String
+  customer   Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade) // ou Restrict
+  type       TransactionType
 
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  amountCents       BigInt  @map("amount_cents")
+  btcSats           BigInt  @map("btc_sats")
+  price_brl_per_btc Decimal @db.Decimal(18, 2)
+
+  occurredAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  idempotencyKey String? @unique
 
   @@index([customerId, occurredAt])
   @@index([occurredAt])

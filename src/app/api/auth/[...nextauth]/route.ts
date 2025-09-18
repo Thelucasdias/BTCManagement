@@ -27,7 +27,7 @@ const handler = NextAuth({
         const ok = await compare(password, user.passwordHash);
         if (!ok) return null;
 
-        return { id: user.id, email: user.email, name: user.name ?? "Admin" };
+        return { id: user.id, email: user.email };
       },
     }),
   ],

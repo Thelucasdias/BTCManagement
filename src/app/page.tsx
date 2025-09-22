@@ -21,47 +21,57 @@ export default function Page() {
         ></meta>
       </Head>
 
-      <header className="bg-gray-800 text-white p-4">
-        <nav className="flex justify-between items-center max-w-7xl mx-auto">
-          <h1 className="text-xl font-bold">InvestMax</h1>
-          <div className="space-x-4">
-            <Link
-              href="/login"
-              className="px-4 py-2 border rounded hover:bg-gray-700 transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition"
-            >
-              Cadastre-se
-            </Link>
+      {/* HEADER */}
+      <header>
+        <nav>
+          <h1>InvestMax</h1>
+          <div>
+            <Link href="/login">Login</Link>
+            <Link href="/signup">Cadastre-se</Link>
           </div>
         </nav>
       </header>
 
-      <main className="text-center py-20 bg-gray-900 text-white">
-        <section className="max-w-4xl mx-auto px-4">
-          <p className="text-2xl mb-4 font-light">Preço do Bitcoin (BTC)</p>
-          <div className="text-6xl font-bold text-green-500 mb-6">
+      {/* HERO */}
+      <main>
+        <section>
+          <p>Preço Atual do Bitcoin</p>
+
+          <div>
             {isLoading && "Carregando..."}
             {error && "Indisponível"}
             {btcPrice && `R$ ${btcPrice.toFixed(2)}`}
           </div>
 
-          <div className="mt-12">
-            <h2 className="text-4xl font-semibold mb-4">
-              A maneira mais fácil e segura de investir.
-            </h2>
-            <p className="text-xl font-light leading-relaxed">
-              Totalmente focados em **Bitcoin** e **Dólar**, somos a única
-              plataforma com **taxa de corretagem gratuita** e **suporte
-              personalizado**. Sua jornada de investimento começa aqui.
-            </p>
+          <h2>A maneira mais fácil e segura de investir.</h2>
+          <p>
+            Somos especialistas em <strong>Bitcoin</strong> e{" "}
+            <strong>Dólar</strong>. Aqui você investe sem pagar{" "}
+            <strong>taxa de corretagem</strong> e conta com{" "}
+            <strong>suporte personalizado</strong> para guiar seus primeiros
+            passos no mercado.
+          </p>
+
+          <div>
+            <Link href="/signup">Começar Agora</Link>
+            <Link href="/login">Já tenho conta</Link>
           </div>
         </section>
       </main>
+
+      {/* FOOTER */}
+      <footer>
+        <div>
+          <p>
+            © {new Date().getFullYear()} InvestMax. Todos os direitos
+            reservados.
+          </p>
+          <div>
+            <Link href="/termos">Termos</Link>
+            <Link href="/privacidade">Privacidade</Link>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

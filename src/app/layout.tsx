@@ -1,5 +1,4 @@
-import "./globals.css";
-import { TRPCProvider } from "@/trpc/provider";
+import TRPCProvider from "@/app/trpc/trpc-provider";
 
 export default function RootLayout({
   children,
@@ -7,7 +6,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body>
         <TRPCProvider>{children}</TRPCProvider>
       </body>

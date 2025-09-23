@@ -24,7 +24,7 @@ export default function Page() {
       {/* HEADER */}
       <header>
         <nav>
-          <h1>InvestMax</h1>
+          <h1>Bitcoin Fácil</h1>
           <div>
             <Link href="/login">Login</Link>
             <Link href="/signup">Cadastre-se</Link>
@@ -59,16 +59,15 @@ export default function Page() {
         </section>
       </main>
 
-      {/* FOOTER */}
       <footer>
         <div>
           <p>
-            © {new Date().getFullYear()} InvestMax. Todos os direitos
+            © {new Date().getFullYear()} BitFácil. Todos os direitos
             reservados.
           </p>
           <div>
-            <Link href="/termos">Termos</Link>
-            <Link href="/privacidade">Privacidade</Link>
+            <Link href="/terms">Termos</Link>
+            <Link href="/privacy">Privacidade</Link>
           </div>
         </div>
       </footer>

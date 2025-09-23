@@ -21,7 +21,7 @@ model User {
   updatedAt    DateTime @updatedAt
 }
 
-model Customer {
+model Client {
   id        String   @id @default(cuid())
   name      String
   email     String?  @unique
@@ -37,14 +37,15 @@ model Customer {
 }
 
 model Transaction {
-  id         String          @id @default(cuid())
-  customerId String
-  customer   Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade) // ou Restrict
-  type       TransactionType
+  id       String          @id @default(cuid())
+  clientId String
+  client   Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
-  amountCents       BigInt  @map("amount_cents")
-  btcSats           BigInt  @map("btc_sats")
-  price_brl_per_btc Decimal @db.Decimal(18, 2)
+  type     TransactionType
+
+  amountCents       BigInt   @map("amount_cents")
+  btcSats           BigInt   @map("btc_sats")
+  price_brl_per_btc Decimal  @db.Decimal(18, 2)
 
   occurredAt DateTime @default(now())
   createdAt  DateTime @default(now())
@@ -52,7 +53,7 @@ model Transaction {
 
   idempotencyKey String? @unique
 
-  @@index([customerId, occurredAt])
+  @@index([clientId, occurredAt])
   @@index([occurredAt])
   @@index([type])
 }

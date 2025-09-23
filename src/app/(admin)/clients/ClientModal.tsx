@@ -10,7 +10,7 @@ export default function ClientModal({
   onClose: () => void;
 }) {
   const { data: transactions, isLoading } =
-    trpc.transaction.listByCustomer.useQuery({ customerId: client.id });
+    trpc.transaction.listByClient.useQuery({ clientId: client.id });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">

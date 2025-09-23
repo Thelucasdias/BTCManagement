@@ -35,19 +35,20 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@hookform/resolvers": "^5.2.1",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.13",
     "@types/bcrypt": "^6.0.0",
     "@types/estree": "^1.0.8",
     "@types/json-schema": "^7.0.15",
     "@types/node": "^20.19.12",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.6",
     "prettier": "^3.3.3",
     "prisma": "^6.15.0",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.13",
     "typescript": "^5"
   }
 }

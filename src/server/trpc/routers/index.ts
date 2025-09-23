@@ -1,10 +1,10 @@
 import { createTRPCRouter } from "../trpc";
-import { customerRouter } from "./customer";
+import { clientRouter } from "./client";
 import { transactionRouter } from "./transactions";
 import { publicRouter } from "./public";
 
 export const appRouter = createTRPCRouter({
-  customer: customerRouter,
+  client: clientRouter,
   transaction: transactionRouter,
   public: publicRouter,
 });

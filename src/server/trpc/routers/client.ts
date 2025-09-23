@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { baseProcedure, createTRPCRouter } from "../trpc";
 
-export const customerRouter = createTRPCRouter({
+export const clientRouter = createTRPCRouter({
   listForAdmin: baseProcedure
     .input(
       z
@@ -15,7 +15,7 @@ export const customerRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const take = input?.limit ?? 20;
 
-      return ctx.prisma.customer.findMany({
+      return ctx.prisma.client.findMany({
         where: input?.q
           ? {
               OR: [
@@ -40,10 +40,9 @@ export const customerRouter = createTRPCRouter({
       });
     }),
 
-  // Você pode manter seus resolvers atuais aqui
   list: baseProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.customer.findMany({
-      include: { transactions: true }, // cuidado: pode ter BigInt
+    return ctx.prisma.client.findMany({
+      include: { transactions: true },
     });
   }),
 
@@ -57,6 +56,6 @@ export const customerRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.customer.create({ data: input });
+      return ctx.prisma.client.create({ data: input });
     }),
 });

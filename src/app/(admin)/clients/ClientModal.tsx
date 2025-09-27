@@ -2,13 +2,38 @@ import { trpc } from "@/utils/trpc";
 import { ClientDTO } from "@/types/client";
 import { TransactionDTO } from "@/types/transaction";
 
+export type ClientModalProps = {
+  client?: ClientDTO;
+  onClose: () => void;
+  isCreating: boolean;
+  onClientChanged?: () => void;
+};
+
 export default function ClientModal({
   client,
   onClose,
-}: {
-  client: ClientDTO;
-  onClose: () => void;
-}) {
+  isCreating,
+  onClientChanged,
+}: ClientModalProps) {
+  if (isCreating) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <div className="bg-white p-6 rounded shadow-lg w-[600px] relative">
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 text-gray-600"
+          >
+            ✕
+          </button>
+          <h2 className="text-lg font-semibold mb-4">Create New Client</h2>
+          <p>Formulário de cadastro vai aqui...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!client) return null;
+
   const { data: transactions, isLoading } =
     trpc.transaction.listByClient.useQuery({ clientId: client.id });
 
@@ -21,13 +46,10 @@ export default function ClientModal({
         >
           ✕
         </button>
-
         <h2 className="text-lg font-semibold mb-4">
           Transactions of {client.name}
         </h2>
-
         {isLoading && <p>Loading...</p>}
-
         {transactions && transactions.length > 0 ? (
           <ul className="space-y-2 max-h-[400px] overflow-y-auto">
             {transactions.map((t: TransactionDTO) => (

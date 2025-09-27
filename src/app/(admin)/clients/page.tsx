@@ -54,7 +54,7 @@ export default function ClientsPage() {
         {/* Modal para criar/editar/deletar */}
         {(selectedClient || isCreating) && (
           <ClientModal
-            client={selectedClient ?? undefined}
+            client={selectedClient as ClientDTO}
             isCreating={isCreating}
             onClose={() => {
               setSelectedClient(null);

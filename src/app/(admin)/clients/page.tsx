@@ -19,7 +19,7 @@ export default function ClientsPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-5xl p-6 bg-white rounded shadow">
+      <div className="w-full max-w-5xl p-6 bg-black rounded shadow">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Clients</h1>

@@ -18,22 +18,26 @@ export default function ClientsPage() {
   } = trpc.client.listForAdmin.useQuery({ limit: 20 });
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-5xl p-6 bg-black rounded shadow">
+    <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center p-6">
+      <div className="w-full max-w-5xl bg-neutral-800 rounded-lg shadow-xl p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Clients</h1>
+        <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+          <h1 className="text-3xl font-semibold tracking-wide">Clients</h1>
           <button
             onClick={() => setIsCreating(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-5 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-medium"
           >
-            + Novo Cliente
+            + New Client
           </button>
         </div>
 
         {/* Conteúdo */}
-        {isLoading && <p>Loading clients...</p>}
-        {error && <p className="text-red-600">Error loading clients</p>}
+        {isLoading && <p className="text-gray-400">Loading clients...</p>}
+        {error && (
+          <p className="text-red-500 font-medium">
+            Error loading clients. Try again.
+          </p>
+        )}
 
         {clients && clients.length > 0 ? (
           <ClientTable
@@ -48,10 +52,12 @@ export default function ClientsPage() {
             onSelectClient={(client) => setSelectedClient(client)}
           />
         ) : (
-          !isLoading && <p className="text-center">No clients found</p>
+          !isLoading && (
+            <p className="text-center text-gray-400 mt-6">No clients found.</p>
+          )
         )}
 
-        {/* Modal para criar/editar/deletar */}
+        {/* Modal */}
         {(selectedClient || isCreating) && (
           <ClientModal
             client={selectedClient as ClientDTO}

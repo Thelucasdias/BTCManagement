@@ -1,11 +1,10 @@
-// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // ...?schema=public
+  url      = env("DATABASE_URL")
 }
 
 enum TransactionType {
@@ -14,38 +13,50 @@ enum TransactionType {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   passwordHash String
+  name         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions     Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
 model Client {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?  @unique
-  phone     String?
-  reference String?
-  cpf       String?  @unique
-  walletRef String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  // deletedAt  DateTime?     // se optar por soft delete
+  id           String            @id @default(cuid())
+  name         String
+  email        String?           @unique
+  phone        String?
+  reference    String?
+  cpf          String?           @unique
+  walletRef    String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   transactions Transaction[]
 }
 
 model Transaction {
-  id       String          @id @default(cuid())
-  clientId String
-  client   Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id                String          @id @default(cuid())
+  clientId          String
+  client            Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
-  type     TransactionType
+  type              TransactionType
 
-  amountCents       BigInt   @map("amount_cents")
-  btcSats           BigInt   @map("btc_sats")
-  price_brl_per_btc Decimal  @db.Decimal(18, 2)
+  amountCents       BigInt          @map("amount_cents")
+  btcSats           BigInt          @map("btc_sats")
+  price_brl_per_btc Decimal         @db.Decimal(18, 2)
 
   occurredAt DateTime @default(now())
   createdAt  DateTime @default(now())

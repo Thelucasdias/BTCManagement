@@ -9,7 +9,10 @@ export default function Page() {
     data: btcPrice,
     isLoading,
     error,
-  } = trpc.public.getBtcPrice.useQuery();
+  } = trpc.public.getBtcPrice.useQuery(undefined, {
+    staleTime: 300_000,
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <>

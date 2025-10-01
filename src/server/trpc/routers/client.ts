@@ -1,14 +1,14 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, baseProcedure } from "../trpc";
 
 export const clientRouter = createTRPCRouter({
-  listForAdmin: publicProcedure
+  listForAdmin: baseProcedure
     .input(
       z
         .object({
           q: z.string().optional(),
           limit: z.number().int().min(1).max(100).optional(),
-          cursor: z.string().uuid().optional(),
+          cursor: z.string().cuid().optional(),
         })
         .optional()
     )
@@ -40,27 +40,27 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
-  create: publicProcedure
+  create: baseProcedure
     .input(
       z.object({
-        name: z.string().min(1),
-        email: z.string().email().optional(),
-        phone: z.string().optional(),
-        cpf: z.string().optional(),
+        name: z.string().min(1, "Nome é obrigatório"),
+        email: z.string().email().nullable().optional(),
+        phone: z.string().optional().nullable(),
+        cpf: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.client.create({ data: input });
     }),
 
-  update: publicProcedure
+  update: baseProcedure
     .input(
       z.object({
-        id: z.string().uuid(),
+        id: z.string().cuid(),
         name: z.string().min(1).optional(),
-        email: z.string().email().optional(),
-        phone: z.string().optional(),
-        cpf: z.string().optional(),
+        email: z.string().email().optional().nullable(),
+        phone: z.string().optional().nullable(),
+        cpf: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -71,8 +71,8 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
-  delete: publicProcedure
-    .input(z.object({ id: z.string().uuid() }))
+  delete: baseProcedure
+    .input(z.object({ id: z.string().cuid() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.client.delete({
         where: { id: input.id },

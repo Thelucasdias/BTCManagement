@@ -36,7 +36,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@hookform/resolvers": "^5.2.1",
-    "@tailwindcss/postcss": "^4.1.13",
     "@types/bcrypt": "^6.0.0",
     "@types/estree": "^1.0.8",
     "@types/json-schema": "^7.0.15",
@@ -49,7 +48,7 @@
     "postcss": "^8.5.6",
     "prettier": "^3.3.3",
     "prisma": "^6.15.0",
-    "tailwindcss": "^4.1.13",
+    "tailwindcss": "^3.4.4",
     "typescript": "^5"
   }
 }

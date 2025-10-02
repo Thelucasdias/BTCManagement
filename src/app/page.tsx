@@ -12,9 +12,9 @@ export default function HomePage() {
   } = trpc.public.getBtcPrice.useQuery();
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Head>
-        <title>Plataforma de Investimento em Bitcoin e Dólar | Taxa Zero</title>
+        <title>Plataforma de Investimento em Bitcoin | Taxa Zero</title>
         <meta
           name="description"
           content="A plataforma mais fácil e segura para investir em Bitcoin e Dólar. Taxa de corretagem gratuita e suporte personalizado."
@@ -47,27 +47,30 @@ export default function HomePage() {
       </header>
 
       {/* HERO (all centered) */}
-      <main className="bg-white">
-        <section className="w-full max-w-4xl mx-auto py-16 px-4 grid place-items-center text-center">
-          <p className="text-lg font-medium text-[#02020A]">
+      <main className="bg-white grow ">
+        <section className="w-full max-w-4xl mx-auto py-40 px-4 grid place-items-center text-center">
+          <p className="text-3xl font-medium text-[#02020A]">
             Preço Atual do <span className="text-[#ECA400]">Bitcoin</span>
           </p>
 
-          <div className="my-4 text-3xl font-semibold text-[#ECA400]">
+          <div className="my-6 text-5xl font-semibold text-[#ECA400]">
             {isLoading && "Carregando..."}
             {error && "Indisponível"}
-            {btcPrice && `R$ ${btcPrice.toFixed(2)}`}
+            {btcPrice &&
+              btcPrice.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
           </div>
 
-          <h2 className="text-3xl font-bold text-[#02020A] mb-4">
+          <h2 className="text-3xl font-bold text-[#02020A] mb-6">
             A maneira mais fácil e segura de investir.
           </h2>
 
           <p className="text-[#02020A] text-lg leading-relaxed mb-8 max-w-2xl">
             Somos especialistas em{" "}
-            <strong className="text-[#ECA400]">Bitcoin</strong> e{" "}
-            <strong className="text-[#ECA400]">Dólar</strong>. Aqui você investe
-            sem pagar{" "}
+            <strong className="text-[#ECA400]">Bitcoin</strong>. Aqui você
+            investe sem pagar{" "}
             <strong className="text-[#ECA400]">taxa de corretagem</strong> e
             conta com{" "}
             <strong className="text-[#ECA400]">suporte personalizado</strong>{" "}
@@ -111,6 +114,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }

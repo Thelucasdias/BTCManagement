@@ -15,7 +15,14 @@ export default function ClientsPage() {
     isLoading,
     error,
     refetch,
-  } = trpc.client.listForAdmin.useQuery({ limit: 20 });
+  } = trpc.client.listForAdmin.useQuery(
+    { limit: 20 },
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      staleTime: Infinity,
+    }
+  );
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center p-6">
@@ -27,7 +34,7 @@ export default function ClientsPage() {
             onClick={() => setIsCreating(true)}
             className="px-5 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-medium"
           >
-            + New Client
+            New Client
           </button>
         </div>
 

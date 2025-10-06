@@ -5,4 +5,6 @@ export type ClientDTO = {
   phone: string;
   cpf: string;
   transactionsCount: number;
+  hashedPassword: string;
+  walletRef?: string;
 };

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import bcrypt from "bcrypt";
 import { createTRPCRouter, baseProcedure } from "../trpc";
 
 export const clientRouter = createTRPCRouter({
@@ -40,19 +41,33 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
+  // CREATE com password obrigatório
   create: baseProcedure
     .input(
       z.object({
         name: z.string().min(1, "Nome é obrigatório"),
-        email: z.string().email().nullable().optional(),
+        email: z.string().email(),
         phone: z.string().optional().nullable(),
         cpf: z.string().optional().nullable(),
+        password: z
+          .string()
+          .min(6, "Senha obrigatória com mínimo 6 caracteres"),
+        walletRef: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.client.create({ data: input });
+      const { password, ...rest } = input;
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      return ctx.prisma.client.create({
+        data: {
+          ...rest,
+          passwordHash,
+        },
+      });
     }),
 
+  // UPDATE sem password
   update: baseProcedure
     .input(
       z.object({
@@ -61,6 +76,7 @@ export const clientRouter = createTRPCRouter({
         email: z.string().email().optional().nullable(),
         phone: z.string().optional().nullable(),
         cpf: z.string().optional().nullable(),
+        walletRef: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {

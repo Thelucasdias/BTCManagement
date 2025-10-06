@@ -20,11 +20,17 @@ export default function ClientModal({
   const [email, setEmail] = useState(client?.email ?? "");
   const [phone, setPhone] = useState(client?.phone ?? "");
   const [cpf, setCpf] = useState((client as any)?.cpf ?? "");
+  const [password, setPassword] = useState("");
+  const [walletRef, setWalletRef] = useState((client as any)?.walletRef ?? "");
+  const [error, setError] = useState("");
 
   const createClient = trpc.client.create.useMutation({
     onSuccess: () => {
       onClientChanged?.();
       onClose();
+    },
+    onError: (err) => {
+      setError(err.message);
     },
   });
 
@@ -32,6 +38,9 @@ export default function ClientModal({
     onSuccess: () => {
       onClientChanged?.();
       onClose();
+    },
+    onError: (err) => {
+      setError(err.message);
     },
   });
 
@@ -43,15 +52,32 @@ export default function ClientModal({
   });
 
   function handleSave() {
+    setError("");
+    if (!email.trim()) {
+      setError("Email é obrigatório.");
+      return;
+    }
+    if (isCreating && password.trim().length < 6) {
+      setError("Senha obrigatória e deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
     if (isCreating) {
-      createClient.mutate({ name, email, phone, cpf });
+      createClient.mutate({ name, email, phone, cpf, password, walletRef });
     } else if (client) {
-      updateClient.mutate({ id: client.id, name, email, phone, cpf });
+      updateClient.mutate({
+        id: client.id,
+        name,
+        email,
+        phone,
+        cpf,
+        walletRef,
+      });
     }
   }
 
   function handleDelete() {
-    if (client && confirm("Are you sure you want to delete this client?")) {
+    if (client && confirm("Tem certeza que deseja excluir este cliente?")) {
       deleteClient.mutate({ id: client.id });
     }
   }
@@ -64,7 +90,7 @@ export default function ClientModal({
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-neutral-900 text-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
-        {/* Close button */}
+        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-300 hover:text-white transition"
@@ -77,6 +103,12 @@ export default function ClientModal({
           {isCreating ? "Create New Client" : `Edit Client: ${client?.name}`}
         </h2>
 
+        {error && (
+          <p className="bg-red-600 text-white text-sm px-3 py-2 rounded mb-4">
+            {error}
+          </p>
+        )}
+
         {/* Form */}
         <div className="space-y-4">
           <input
@@ -88,11 +120,22 @@ export default function ClientModal({
           />
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email "
             className="w-full bg-gray-800 text-white border border-gray-600 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+
+          {isCreating && (
+            <input
+              type="password"
+              placeholder="Senha "
+              className="w-full bg-gray-800 text-white border border-gray-600 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          )}
+
           <input
             type="text"
             placeholder="Phone"
@@ -107,9 +150,17 @@ export default function ClientModal({
             value={cpf}
             onChange={(e) => setCpf(e.target.value)}
           />
+
+          <input
+            type="text"
+            placeholder="Wallet Ref (opcional)"
+            className="w-full bg-gray-800 text-white border border-gray-600 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={walletRef}
+            onChange={(e) => setWalletRef(e.target.value)}
+          />
         </div>
 
-        {/* Action buttons */}
+        {/* Actions */}
         <div className="flex justify-end gap-3 mt-6">
           {!isCreating && (
             <button

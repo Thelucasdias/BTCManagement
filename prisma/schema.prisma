@@ -40,6 +40,7 @@ model Client {
   phone        String?
   reference    String?
   cpf          String?           @unique
+  passwordHash String
   walletRef    String?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt

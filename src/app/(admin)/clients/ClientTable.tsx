@@ -9,7 +9,6 @@ export default function ClientTable({
 }) {
   return (
     <table className="w-full border-collapse rounded-lg overflow-hidden text-white">
-      {/* Cabeçalho */}
       <thead className="bg-neutral-800 text-white">
         <tr>
           <th className="p-3 text-left font-semibold">Name</th>
@@ -21,7 +20,6 @@ export default function ClientTable({
         </tr>
       </thead>
 
-      {/* Corpo */}
       <tbody>
         {clients.map((c) => (
           <tr

@@ -100,7 +100,7 @@ export default function ClientModal({
 
         {/* Title */}
         <h2 className="text-2xl font-semibold mb-6 border-b border-gray-700 pb-2">
-          {isCreating ? "Create New Client" : `Edit Client: ${client?.name}`}
+          {isCreating ? "Create New Client" : `Client: ${client?.name}`}
         </h2>
 
         {error && (
@@ -153,7 +153,7 @@ export default function ClientModal({
 
           <input
             type="text"
-            placeholder="Wallet Ref (opcional)"
+            placeholder="Wallet Ref"
             className="w-full bg-gray-800 text-white border border-gray-600 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={walletRef}
             onChange={(e) => setWalletRef(e.target.value)}

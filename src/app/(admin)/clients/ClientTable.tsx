@@ -1,12 +1,19 @@
+// src/app/(admin)/clients/ClientTable.tsx
 import { ClientDTO } from "@/types/client";
+
+type Props = {
+  clients: ClientDTO[];
+  onSelectClient: (client: ClientDTO) => void;
+  onDeposit: (client: ClientDTO) => void;
+  onWithdraw: (client: ClientDTO) => void;
+};
 
 export default function ClientTable({
   clients,
   onSelectClient,
-}: {
-  clients: ClientDTO[];
-  onSelectClient: (client: ClientDTO) => void;
-}) {
+  onDeposit,
+  onWithdraw,
+}: Props) {
   return (
     <table className="w-full border-collapse rounded-lg overflow-hidden text-white">
       <thead className="bg-neutral-800 text-white">
@@ -39,10 +46,16 @@ export default function ClientTable({
                 >
                   View
                 </button>
-                <button className="px-4 py-1.5 rounded bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors shadow-sm">
+                <button
+                  onClick={() => onDeposit(c)}
+                  className="px-4 py-1.5 rounded bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors shadow-sm"
+                >
                   Deposit
                 </button>
-                <button className="px-4 py-1.5 rounded bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors shadow-sm">
+                <button
+                  onClick={() => onWithdraw(c)}
+                  className="px-4 py-1.5 rounded bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors shadow-sm"
+                >
                   Withdraw
                 </button>
               </div>

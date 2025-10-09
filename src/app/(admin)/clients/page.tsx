@@ -5,10 +5,17 @@ import { trpc } from "@/utils/trpc";
 import { ClientDTO } from "@/types/client";
 import ClientTable from "./ClientTable";
 import ClientModal from "./ClientModal";
+import TransactionModal from "./TransactionModal";
+
+type TxKind = "DEPOSIT" | "WITHDRAWAL";
 
 export default function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState<ClientDTO | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+
+  // estado para o modal de transações
+  const [txClient, setTxClient] = useState<ClientDTO | null>(null);
+  const [txKind, setTxKind] = useState<TxKind | null>(null);
 
   const {
     data: clients,
@@ -23,6 +30,17 @@ export default function ClientsPage() {
       staleTime: Infinity,
     }
   );
+
+  // Handlers para abrir modal de depósito/saque
+  function handleDeposit(c: ClientDTO) {
+    setTxClient(c);
+    setTxKind("DEPOSIT");
+  }
+
+  function handleWithdraw(c: ClientDTO) {
+    setTxClient(c);
+    setTxKind("WITHDRAWAL");
+  }
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center p-6">
@@ -55,8 +73,12 @@ export default function ClientsPage() {
               phone: c.phone ?? "",
               cpf: (c as any).cpf ?? "",
               transactionsCount: c._count.transactions,
+              hashedPassword: (c as any).hashedPassword ?? "",
+              walletRef: (c as any).walletRef,
             }))}
             onSelectClient={(client) => setSelectedClient(client)}
+            onDeposit={handleDeposit} // <--- NOVO
+            onWithdraw={handleWithdraw} // <--- NOVO
           />
         ) : (
           !isLoading && (
@@ -64,7 +86,7 @@ export default function ClientsPage() {
           )
         )}
 
-        {/* Modal */}
+        {/* Modal de Client */}
         {(selectedClient || isCreating) && (
           <ClientModal
             client={selectedClient as ClientDTO}
@@ -74,6 +96,19 @@ export default function ClientsPage() {
               setIsCreating(false);
             }}
             onClientChanged={refetch}
+          />
+        )}
+
+        {/* Modal de Transação */}
+        {txClient && txKind && (
+          <TransactionModal
+            client={txClient}
+            kind={txKind}
+            onClose={() => {
+              setTxClient(null);
+              setTxKind(null);
+            }}
+            onSuccess={refetch}
           />
         )}
       </div>

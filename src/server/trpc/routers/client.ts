@@ -41,7 +41,6 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
-  // CREATE com password obrigatório
   create: baseProcedure
     .input(
       z.object({
@@ -67,7 +66,7 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
-  // UPDATE sem password
+  // UPDATE without password
   update: baseProcedure
     .input(
       z.object({

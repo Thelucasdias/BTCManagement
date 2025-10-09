@@ -56,7 +56,7 @@ model Transaction {
   type              TransactionType
 
   amountCents       BigInt          @map("amount_cents")
-  btcSats           BigInt          @map("btc_sats")
+  btcValue          Decimal        @db.Decimal(18, 8)
   price_brl_per_btc Decimal         @db.Decimal(18, 2)
 
   occurredAt DateTime @default(now())

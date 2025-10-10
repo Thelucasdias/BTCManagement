@@ -197,7 +197,7 @@ export default function ClientModal({
                       {(t.amount_cents / 100).toFixed(2)} BRL
                     </p>
                     <p>
-                      <strong>BTC:</strong> {t.btc_sats} sats
+                      <strong>BTC:</strong> {t.btc_value}
                     </p>
                     <p>
                       <strong>Date:</strong>{" "}

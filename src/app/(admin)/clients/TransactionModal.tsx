@@ -40,7 +40,7 @@ export default function TransactionModal({
       clientId: client.id,
       type: kind, // back-end espera 'type'
       amountCents, // back-end espera valor em centavos
-      btcSats: BigInt(0), // placeholder por enquanto
+      btcValue: BigInt(0), // placeholder por enquanto
       price_brl_per_btc: "0", // placeholder por enquanto
     } as any);
   }

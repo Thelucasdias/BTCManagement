@@ -6,6 +6,7 @@ import { ClientDTO } from "@/types/client";
 import ClientTable from "./ClientTable";
 import ClientModal from "./ClientModal";
 import TransactionModal from "./TransactionModal";
+import { signOut } from "next-auth/react"; // Já estava aqui, o que é ótimo!
 
 type TxKind = "DEPOSIT" | "WITHDRAWAL";
 
@@ -46,12 +47,23 @@ export default function ClientsPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
           <h1 className="text-3xl font-semibold tracking-wide">Clients</h1>
-          <button
-            onClick={() => setIsCreating(true)}
-            className="px-5 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-medium"
-          >
-            New Client
-          </button>
+
+          <div className="flex space-x-4">
+            {/* NOVO BOTÃO DE LOGOUT AQUI */}
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="px-5 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white font-medium"
+            >
+              Logout
+            </button>
+
+            <button
+              onClick={() => setIsCreating(true)}
+              className="px-5 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-medium"
+            >
+              New Client
+            </button>
+          </div>
         </div>
 
         {/* Conteúdo */}
@@ -75,8 +87,8 @@ export default function ClientsPage() {
               walletRef: (c as any).walletRef,
             }))}
             onSelectClient={(client) => setSelectedClient(client)}
-            onDeposit={handleDeposit} // <--- NOVO
-            onWithdraw={handleWithdraw} // <--- NOVO
+            onDeposit={handleDeposit}
+            onWithdraw={handleWithdraw}
           />
         ) : (
           !isLoading && (

@@ -1,26 +1,36 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
 
-    try {
-      console.log("Email:", email, "Password:", password);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert("Login efetuado com sucesso!");
-    } catch (err) {
+    // Chama o NextAuth CredentialsProvider
+    const res = await signIn("credentials", {
+      redirect: false, // evita redirecionamento automático
+      email,
+      password,
+    });
+
+    setIsSubmitting(false);
+
+    if (res?.error) {
+      // Login falhou
       setError("Credenciais inválidas.");
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      // Login OK, redireciona para home ou dashboard
+      router.push("/");
     }
   };
 

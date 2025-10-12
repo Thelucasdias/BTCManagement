@@ -13,7 +13,6 @@ export default function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState<ClientDTO | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  // estado para o modal de transações
   const [txClient, setTxClient] = useState<ClientDTO | null>(null);
   const [txKind, setTxKind] = useState<TxKind | null>(null);
 
@@ -31,7 +30,6 @@ export default function ClientsPage() {
     }
   );
 
-  // Handlers para abrir modal de depósito/saque
   function handleDeposit(c: ClientDTO) {
     setTxClient(c);
     setTxKind("DEPOSIT");

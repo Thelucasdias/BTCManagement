@@ -21,32 +21,47 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const parsed = credsSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-        const { email, password } = parsed.data;
+        if (!credentials?.email || !credentials?.password) return null;
 
+        const emailLower = credentials.email.toLowerCase();
+
+        // busca user admin ou user interno
         const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() },
+          where: { email: emailLower },
         });
+
         if (!user || !user.passwordHash) return null;
 
-        const ok = await compare(password, user.passwordHash);
-        if (!ok) return null;
+        const isValid = await compare(credentials.password, user.passwordHash);
+        if (!isValid) return null;
 
         return {
           id: user.id,
           email: user.email,
+          role: user.role, // importante para controle de acesso
+          name: user.name || "",
         };
       },
     }),
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      if (session.user && token?.sub) {
-        session.user.id = token.sub;
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },
+  },
+  pages: {
+    signIn: "/login",
   },
 };
 

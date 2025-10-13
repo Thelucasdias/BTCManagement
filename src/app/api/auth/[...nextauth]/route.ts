@@ -9,6 +9,13 @@ const credsSchema = z.object({
   password: z.string().min(8),
 });
 
+type AuthUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+};
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -24,22 +31,58 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         const emailLower = credentials.email.toLowerCase();
+        let authEntity: AuthUser | null = null;
+        let passwordHash: string | null = null;
 
-        // busca user admin ou user interno
         const user = await prisma.user.findUnique({
           where: { email: emailLower },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            passwordHash: true,
+          },
         });
 
-        if (!user || !user.passwordHash) return null;
+        if (user) {
+          authEntity = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+          passwordHash = user.passwordHash;
+        }
 
-        const isValid = await compare(credentials.password, user.passwordHash);
+        if (!authEntity) {
+          const client = await prisma.client.findUnique({
+            where: { email: emailLower },
+            select: { id: true, email: true, name: true, passwordHash: true },
+          });
+
+          if (client) {
+            authEntity = {
+              id: client.id,
+              email: client.email,
+              name: client.name,
+              role: "CLIENT",
+            };
+            passwordHash = client.passwordHash;
+          }
+        }
+
+        if (!authEntity || !passwordHash) return null;
+
+        const isValid = await compare(credentials.password, passwordHash);
+
         if (!isValid) return null;
 
         return {
-          id: user.id,
-          email: user.email,
-          role: user.role, // importante para controle de acesso
-          name: user.name || "",
+          id: authEntity.id,
+          email: authEntity.email,
+          role: authEntity.role,
+          name: authEntity.name || "",
         };
       },
     }),

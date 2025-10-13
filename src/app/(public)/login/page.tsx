@@ -30,7 +30,7 @@ export default function LoginPage() {
       setError("Credenciais inválidas.");
     } else {
       // Login OK, redireciona para home ou dashboard
-      router.push("/");
+      router.push("/dashboard");
     }
   };
 

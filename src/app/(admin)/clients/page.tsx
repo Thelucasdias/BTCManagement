@@ -6,7 +6,7 @@ import { ClientDTO } from "@/types/client";
 import ClientTable from "./ClientTable";
 import ClientModal from "./ClientModal";
 import TransactionModal from "./TransactionModal";
-import { signOut } from "next-auth/react"; // Já estava aqui, o que é ótimo!
+import { signOut } from "next-auth/react";
 
 type TxKind = "DEPOSIT" | "WITHDRAWAL";
 

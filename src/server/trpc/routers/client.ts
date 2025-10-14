@@ -1,9 +1,9 @@
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { createTRPCRouter, baseProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const clientRouter = createTRPCRouter({
-  listForAdmin: baseProcedure
+  listForAdmin: publicProcedure
     .input(
       z
         .object({
@@ -41,7 +41,7 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
-  create: baseProcedure
+  create: publicProcedure
     .input(
       z.object({
         name: z.string().min(1, "Nome é obrigatório"),
@@ -67,7 +67,7 @@ export const clientRouter = createTRPCRouter({
     }),
 
   // UPDATE without password
-  update: baseProcedure
+  update: publicProcedure
     .input(
       z.object({
         id: z.string().cuid(),
@@ -80,13 +80,17 @@ export const clientRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
+      // Remove keys with null or undefined values
+      const filteredData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== null && v !== undefined)
+      );
       return ctx.prisma.client.update({
         where: { id },
-        data,
+        data: filteredData,
       });
     }),
 
-  delete: baseProcedure
+  delete: publicProcedure
     .input(z.object({ id: z.string().cuid() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.client.delete({

@@ -2,6 +2,7 @@ import { trpc } from "@/utils/trpc";
 import { ClientDTO } from "@/types/client";
 import { TransactionDTO } from "@/types/transaction";
 import { useState } from "react";
+import ClientBalanceSummary from "./ClientBalanceSummary";
 
 export type ClientModalProps = {
   client?: ClientDTO;
@@ -89,7 +90,7 @@ export default function ClientModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 text-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+      <div className="bg-neutral-900 text-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 relative">
         {/* Close */}
         <button
           onClick={onClose}
@@ -183,29 +184,32 @@ export default function ClientModal({
           <div className="mt-6">
             {isLoading && <p className="text-gray-400">Loading...</p>}
             {transactions && transactions.length > 0 ? (
-              <ul className="space-y-3 max-h-72 overflow-y-auto">
-                {transactions.map((t: TransactionDTO) => (
-                  <li
-                    key={t.id}
-                    className="bg-gray-800 p-3 rounded border border-gray-700"
-                  >
-                    <p>
-                      <strong>Type:</strong> {t.type}
-                    </p>
-                    <p>
-                      <strong>Amount:</strong>{" "}
-                      {(t.amount_cents / 100).toFixed(2)} BRL
-                    </p>
-                    <p>
-                      <strong>BTC:</strong> {t.btc_value}
-                    </p>
-                    <p>
-                      <strong>Date:</strong>{" "}
-                      {new Date(t.date).toLocaleString("pt-BR")}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <ClientBalanceSummary transactions={transactions} />
+                <ul className="space-y-3 max-h-72 overflow-y-auto">
+                  {transactions.map((t: TransactionDTO) => (
+                    <li
+                      key={t.id}
+                      className="bg-gray-800 p-3 rounded border border-gray-700"
+                    >
+                      <p>
+                        <strong>Type:</strong> {t.type}
+                      </p>
+                      <p>
+                        <strong>Amount:</strong>{" "}
+                        {(t.amount_cents / 100).toFixed(2)} BRL
+                      </p>
+                      <p>
+                        <strong>BTC:</strong> {t.btc_value}
+                      </p>
+                      <p>
+                        <strong>Date:</strong>{" "}
+                        {new Date(t.date).toLocaleString("pt-BR")}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </>
             ) : (
               <p className="text-gray-400">No transactions found</p>
             )}

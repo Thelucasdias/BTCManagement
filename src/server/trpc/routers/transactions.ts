@@ -55,6 +55,7 @@ export const transactionRouter = createTRPCRouter({
         amount_cents: Number(t.amountCents),
         type: t.type,
         btc_value: t.btcValue.toString(),
+        price_brl_per_btc: t.price_brl_per_btc.toString(),
       }));
     }),
 });

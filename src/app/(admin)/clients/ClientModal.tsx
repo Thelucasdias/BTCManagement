@@ -11,6 +11,17 @@ export type ClientModalProps = {
   onClientChanged?: () => void;
 };
 
+const formatBRL = (priceString: string | undefined): string => {
+  if (!priceString) return "N/A";
+
+  const price = parseFloat(priceString);
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(price);
+};
+
 export default function ClientModal({
   client,
   isCreating = false,
@@ -91,7 +102,6 @@ export default function ClientModal({
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-neutral-900 text-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 relative">
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-300 hover:text-white transition"
@@ -99,7 +109,6 @@ export default function ClientModal({
           ✕
         </button>
 
-        {/* Title */}
         <h2 className="text-2xl font-semibold mb-6 border-b border-gray-700 pb-2">
           {isCreating ? "Create New Client" : `Client: ${client?.name}`}
         </h2>
@@ -110,7 +119,6 @@ export default function ClientModal({
           </p>
         )}
 
-        {/* Form */}
         <div className="space-y-4">
           <input
             type="text"
@@ -161,7 +169,6 @@ export default function ClientModal({
           />
         </div>
 
-        {/* Actions */}
         <div className="flex justify-end gap-3 mt-6">
           {!isCreating && (
             <button
@@ -179,13 +186,16 @@ export default function ClientModal({
           </button>
         </div>
 
-        {/* Transactions */}
         {!isCreating && client && (
           <div className="mt-6">
+            <h3 className="text-xl font-semibold mb-3 border-b border-gray-700 pb-1">
+              Transactions History
+            </h3>
             {isLoading && <p className="text-gray-400">Loading...</p>}
             {transactions && transactions.length > 0 ? (
               <>
                 <ClientBalanceSummary transactions={transactions} />
+
                 <ul className="space-y-3 max-h-72 overflow-y-auto">
                   {transactions.map((t: TransactionDTO) => (
                     <li
@@ -202,6 +212,12 @@ export default function ClientModal({
                       <p>
                         <strong>BTC:</strong> {t.btc_value}
                       </p>
+
+                      <p>
+                        <strong>BTC quote:</strong>{" "}
+                        {formatBRL(t.price_brl_per_btc)}
+                      </p>
+
                       <p>
                         <strong>Date:</strong>{" "}
                         {new Date(t.date).toLocaleString("pt-BR")}

@@ -6,4 +6,5 @@ export type TransactionDTO = {
   amount_cents: number;
   type: "DEPOSIT" | "WITHDRAWAL";
   btc_value: string;
+  price_brl_per_btc: string;
 };

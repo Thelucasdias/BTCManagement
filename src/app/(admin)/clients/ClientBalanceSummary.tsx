@@ -1,10 +1,17 @@
 import { TransactionDTO } from "@/types/transaction";
+import { trpc } from "@/utils/trpc";
 
 type Props = {
   transactions: TransactionDTO[];
 };
 
 export default function ClientBalanceSummary({ transactions }: Props) {
+  const {
+    data: btcPriceData,
+    isLoading: loadingPrice,
+    error,
+  } = trpc.public.getBtcPrice.useQuery();
+
   if (!transactions || transactions.length === 0) {
     return null;
   }
@@ -35,6 +42,12 @@ export default function ClientBalanceSummary({ transactions }: Props) {
   const balanceBRL = totals.depositBRL - totals.withdrawBRL;
   const balanceBTC = totals.depositBTC - totals.withdrawBTC;
 
+  // calcular current balance em BRL usando o preço atual do BTC
+
+  const btcPriceBRL = btcPriceData ?? 0;
+
+  const currentBalanceBRL = balanceBTC * btcPriceBRL;
+
   return (
     <div className="mb-4 p-3 rounded bg-gray-800 border border-gray-700">
       <p>
@@ -49,6 +62,23 @@ export default function ClientBalanceSummary({ transactions }: Props) {
         <strong>Balance:</strong> {balanceBRL.toFixed(2)} BRL (
         {balanceBTC.toFixed(8)} BTC)
       </p>
+
+      {/* Current Balance com cotação atual */}
+      <p className="mt-2 border-t border-gray-700 pt-2 text-blue-400">
+        <strong>Current Balance:</strong>{" "}
+        {loadingPrice
+          ? "Carregando..."
+          : `R$ ${currentBalanceBRL.toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} (${balanceBTC.toFixed(8)} BTC)`}
+      </p>
+
+      {error && (
+        <p className="text-red-400 text-sm mt-1">
+          Erro ao carregar cotação do BTC.
+        </p>
+      )}
     </div>
   );
 }

@@ -42,11 +42,19 @@ export default function ClientBalanceSummary({ transactions }: Props) {
   const balanceBRL = totals.depositBRL - totals.withdrawBRL;
   const balanceBTC = totals.depositBTC - totals.withdrawBTC;
 
-  // calcular current balance em BRL usando o preço atual do BTC
-
   const btcPriceBRL = btcPriceData ?? 0;
 
   const currentBalanceBRL = balanceBTC * btcPriceBRL;
+
+  // Função auxiliar para formatar o preço do BTC
+  const formatBRLPrice = (price: number) => {
+    return price.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
 
   return (
     <div className="mb-4 p-3 rounded bg-gray-800 border border-gray-700">
@@ -68,10 +76,15 @@ export default function ClientBalanceSummary({ transactions }: Props) {
         <strong>Current Balance:</strong>{" "}
         {loadingPrice
           ? "Carregando..."
-          : `R$ ${currentBalanceBRL.toLocaleString("pt-BR", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })} (${balanceBTC.toFixed(8)} BTC)`}
+          : formatBRLPrice(currentBalanceBRL) +
+            ` (${balanceBTC.toFixed(8)} BTC)`}
+      </p>
+
+      {/* ✅ COTAÇÃO ATUAL DO BTC ADICIONADA AQUI */}
+      <p className="text-sm text-gray-400 mt-1">
+        {loadingPrice
+          ? "..."
+          : `Current BTC Price: ${formatBRLPrice(btcPriceBRL)} / BTC`}
       </p>
 
       {error && (

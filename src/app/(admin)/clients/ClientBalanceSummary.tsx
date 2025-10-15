@@ -21,9 +21,15 @@ export default function ClientBalanceSummary({ transactions }: Props) {
       const amountBRL = Number(t.amount_cents) / 100;
       const amountBTC = Number(t.btc_value);
 
+      // Converte a cotação (string) para número
+      const btcQuote = Number(t.price_brl_per_btc);
+
       if (t.type === "DEPOSIT") {
         acc.depositBRL += amountBRL;
         acc.depositBTC += amountBTC;
+        // ✅ ADICIONA O PREÇO DO BTC E CONTA O DEPÓSITO
+        acc.totalDepositBtcQuote += btcQuote;
+        acc.depositCount += 1;
       } else if (t.type === "WITHDRAWAL") {
         acc.withdrawBRL += amountBRL;
         acc.withdrawBTC += amountBTC;
@@ -36,6 +42,9 @@ export default function ClientBalanceSummary({ transactions }: Props) {
       withdrawBRL: 0,
       depositBTC: 0,
       withdrawBTC: 0,
+      // ✅ NOVOS ACUMULADORES
+      totalDepositBtcQuote: 0,
+      depositCount: 0,
     }
   );
 
@@ -46,7 +55,13 @@ export default function ClientBalanceSummary({ transactions }: Props) {
 
   const currentBalanceBRL = balanceBTC * btcPriceBRL;
 
-  // Função auxiliar para formatar o preço do BTC
+  // ✅ CÁLCULO DA MÉDIA
+  const avgDepositPrice =
+    totals.depositCount > 0
+      ? totals.totalDepositBtcQuote / totals.depositCount
+      : 0;
+
+  // Função auxiliar para formatar o preço do BTC (mantida do exemplo anterior)
   const formatBRLPrice = (price: number) => {
     return price.toLocaleString("pt-BR", {
       style: "currency",
@@ -66,13 +81,14 @@ export default function ClientBalanceSummary({ transactions }: Props) {
         <strong>Total Withdrawals:</strong> {totals.withdrawBRL.toFixed(2)} BRL
         ({totals.withdrawBTC.toFixed(8)} BTC)
       </p>
+
       <p className="mt-2 border-t border-gray-700 pt-2">
         <strong>Balance:</strong> {balanceBRL.toFixed(2)} BRL (
         {balanceBTC.toFixed(8)} BTC)
       </p>
 
       {/* Current Balance com cotação atual */}
-      <p className="mt-2 border-t border-gray-700 pt-2 text-blue-400">
+      <p className="mt-2 pt-2 text-blue-400">
         <strong>Current Balance:</strong>{" "}
         {loadingPrice
           ? "Carregando..."
@@ -80,11 +96,16 @@ export default function ClientBalanceSummary({ transactions }: Props) {
             ` (${balanceBTC.toFixed(8)} BTC)`}
       </p>
 
-      {/* ✅ COTAÇÃO ATUAL DO BTC ADICIONADA AQUI */}
+      {/* Cotação Atual (para comparação) */}
       <p className="text-sm text-gray-400 mt-1">
         {loadingPrice
           ? "..."
-          : `Current BTC Price: ${formatBRLPrice(btcPriceBRL)} / BTC`}
+          : `Current BTC Price: ${formatBRLPrice(btcPriceBRL)} BTC`}
+      </p>
+      {/* ✅ NOVA LINHA PARA A MÉDIA */}
+      <p className="mt-2 border-t border-gray-700 pt-2 text-yellow-400">
+        <strong>Average Deposit Price:</strong>{" "}
+        {formatBRLPrice(avgDepositPrice)} BTC
       </p>
 
       {error && (

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure, baseProcedure } from "../trpc";
 
 export const clientRouter = createTRPCRouter({
   listForAdmin: publicProcedure
@@ -66,7 +66,6 @@ export const clientRouter = createTRPCRouter({
       });
     }),
 
-  // UPDATE without password
   update: publicProcedure
     .input(
       z.object({
@@ -80,7 +79,6 @@ export const clientRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
-      // Remove keys with null or undefined values
       const filteredData = Object.fromEntries(
         Object.entries(data).filter(([_, v]) => v !== null && v !== undefined)
       );
@@ -97,4 +95,53 @@ export const clientRouter = createTRPCRouter({
         where: { id: input.id },
       });
     }),
+
+  getTransactions: baseProcedure.query(async ({ ctx }) => {
+    const client = await ctx.prisma.client.findUnique({
+      where: { id: ctx.userId! },
+      select: { name: true },
+    });
+
+    const prismaTransactions = await ctx.prisma.transaction.findMany({
+      where: {
+        clientId: ctx.userId!,
+      },
+      select: {
+        id: true,
+        type: true,
+        amountCents: true,
+        btcValue: true,
+        price_brl_per_btc: true,
+        createdAt: true,
+        clientId: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const transactions = prismaTransactions.map((tx) => {
+      const transformedTx = {
+        id: tx.id,
+        type: tx.type as "DEPOSIT" | "WITHDRAWAL",
+        customerId: tx.clientId,
+        customerName: client?.name ?? "Nome Desconhecido",
+        date: tx.createdAt.toISOString(),
+        amount_cents: Number(tx.amountCents),
+        btc_value: tx.btcValue.toFixed(8),
+        price_brl_per_btc: tx.price_brl_per_btc.toFixed(2),
+      };
+
+      return {
+        id: transformedTx.id,
+        customerId: transformedTx.customerId,
+        customerName: transformedTx.customerName,
+        date: transformedTx.date,
+        amount_cents: transformedTx.amount_cents,
+        type: transformedTx.type,
+        btc_value: transformedTx.btc_value,
+        price_brl_per_btc: transformedTx.price_brl_per_btc,
+      } as const;
+    });
+
+    return transactions;
+  }),
 });

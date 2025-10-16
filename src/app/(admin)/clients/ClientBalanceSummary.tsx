@@ -1,9 +1,20 @@
 import { TransactionDTO } from "@/types/transaction";
 import { trpc } from "@/utils/trpc";
+import { useClientBalanceSummary } from "@/hooks/useClientBalance";
+import { formatCurrencyBRL } from "@/lib/money";
 
 type Props = {
   transactions: TransactionDTO[];
 };
+
+interface LocalTotals {
+  depositBRL: number;
+  withdrawBRL: number;
+  depositBTC: number;
+  withdrawBTC: number;
+  totalDepositBtcQuote: number;
+  depositCount: number;
+}
 
 export default function ClientBalanceSummary({ transactions }: Props) {
   const {
@@ -13,14 +24,17 @@ export default function ClientBalanceSummary({ transactions }: Props) {
   } = trpc.public.getBtcPrice.useQuery();
 
   if (!transactions || transactions.length === 0) {
-    return null;
+    return (
+      <div className="mb-4 p-3 rounded bg-gray-800 border border-gray-700 text-center text-gray-400">
+        No transactions found for this client.
+      </div>
+    );
   }
 
-  const totals = transactions.reduce(
+  const totals: LocalTotals = transactions.reduce(
     (acc, t) => {
       const amountBRL = Number(t.amount_cents) / 100;
       const amountBTC = Number(t.btc_value);
-
       const btcQuote = Number(t.price_brl_per_btc);
 
       if (t.type === "DEPOSIT") {
@@ -42,32 +56,22 @@ export default function ClientBalanceSummary({ transactions }: Props) {
       withdrawBTC: 0,
       totalDepositBtcQuote: 0,
       depositCount: 0,
-    }
+    } as LocalTotals
   );
 
   const balanceBRL = totals.depositBRL - totals.withdrawBRL;
-  const balanceBTC = totals.depositBTC - totals.withdrawBTC;
-
   const btcPriceBRL = btcPriceData ?? 0;
 
-  const currentBalanceBRL = balanceBTC * btcPriceBRL;
+  const summary = useClientBalanceSummary({
+    transactions: transactions,
+    btcPriceBRL: btcPriceBRL,
+  });
 
-  const avgDepositPrice =
-    totals.depositCount > 0
-      ? totals.totalDepositBtcQuote / totals.depositCount
-      : 0;
-
-  const formatBRLPrice = (price: number) => {
-    return price.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
+  const formatBRLPrice = (value: number) =>
+    formatCurrencyBRL(Math.round(value * 100));
 
   return (
-    <div className="mb-4 p-3 rounded bg-gray-800 border border-gray-700">
+    <div className="mb-4 p-3 rounded bg-gray-800 border border-gray-700 text-white">
       <p>
         <strong>Total Deposits:</strong> {formatBRLPrice(totals.depositBRL)} (
         {totals.depositBTC.toFixed(8)} BTC)
@@ -78,32 +82,28 @@ export default function ClientBalanceSummary({ transactions }: Props) {
       </p>
 
       <p className="mt-2 border-t border-gray-700 pt-2">
-        <strong>Balance:</strong> {formatBRLPrice(balanceBRL)} (
-        {balanceBTC.toFixed(8)} BTC)
+        <strong>Balance:</strong> {formatBRLPrice(balanceBRL)}(
+        {summary.balanceBTCAmount} BTC)
       </p>
 
       <p className="mt-2 pt-2 text-blue-400">
-        <strong>Current Balance:</strong>{" "}
+        <strong>Current Value:</strong>{" "}
         {loadingPrice
-          ? "Carregando..."
-          : formatBRLPrice(currentBalanceBRL) +
-            ` (${balanceBTC.toFixed(8)} BTC)`}
+          ? "Loading..."
+          : formatCurrencyBRL(summary.currentBalanceCents) +
+            ` (${summary.balanceBTCAmount} BTC)`}
       </p>
 
       <p className="text-sm text-gray-400 mt-1">
-        {loadingPrice
-          ? "..."
-          : `Current BTC Price: ${formatBRLPrice(btcPriceBRL)} / BTC`}
+        {loadingPrice ? "..." : `Current Quote: ${formatBRLPrice(btcPriceBRL)}`}
       </p>
       <p className="mt-2 border-t border-gray-700 pt-2 text-yellow-400">
         <strong>Average Deposit Price:</strong>{" "}
-        {formatBRLPrice(avgDepositPrice)} / BTC
+        {formatBRLPrice(summary.avgDepositPrice)}
       </p>
 
       {error && (
-        <p className="text-red-400 text-sm mt-1">
-          Erro ao carregar cotação do BTC.
-        </p>
+        <p className="text-red-400 text-sm mt-1">Error loading BTC quote.</p>
       )}
     </div>
   );

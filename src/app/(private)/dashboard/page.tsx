@@ -35,6 +35,9 @@ export default function DashboardPage() {
     isPositive,
   } = summary;
 
+  const isProfit = !isPositive;
+  const profitLossLabel = isProfit ? "Lucro" : "Desvalorização";
+
   const [isDepositing, setIsDepositing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
 
@@ -62,13 +65,13 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50 flex items-start justify-center p-4 sm:p-8">
       <div className="w-full max-w-xl bg-white shadow-2xl rounded-xl p-6 sm:p-10 transform transition-all duration-300">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center border-b pb-3">
-          Bitcoin Easy
+          Bitcoin fácil
         </h1>
 
         <div className="space-y-6 text-center">
           <div className="text-gray-500">
             <p className="text-sm font-semibold uppercase tracking-wider">
-              Total Invested
+              Total investido
             </p>
             <p className="text-2xl font-medium text-gray-700">
               {formatCurrencyBRL(totalInvestedCents)}
@@ -77,23 +80,23 @@ export default function DashboardPage() {
 
           <div className="py-4 border-t border-b border-gray-100">
             <p className="text-lg text-gray-500 uppercase tracking-widest mb-1">
-              Current Balance
+              Saldo atual
             </p>
             <p className="text-5xl sm:text-7xl font-extrabold text-gray-900 leading-tight transition-all duration-500">
               {formatCurrencyBRL(currentBalanceCents)}
             </p>
 
             <div
-              className={`text-lg font-bold mt-2 ${isPositive ? "text-green-600" : "text-red-600"}`}
+              className={`text-lg font-bold mt-2 ${isProfit ? "text-green-600" : "text-red-600"}`}
             >
-              {isPositive ? "↑" : "↓"} {formatCurrencyBRL(profitLossCents)} (
-              {isPositive ? "Profit" : "Loss"})
+              {isProfit ? "↑" : "↓"} {formatCurrencyBRL(profitLossCents)} (
+              {profitLossLabel})
             </div>
           </div>
 
           <div className="text-gray-500">
             <p className="text-sm font-semibold uppercase tracking-wider">
-              Bitcoin Balance
+              Saldo em Bitcoin
             </p>
             <p className="text-2xl font-medium text-gray-700">
               {formatBtcValue(balanceBTCAmount)}

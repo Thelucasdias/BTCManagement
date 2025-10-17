@@ -123,9 +123,7 @@ export default function DashboardPage() {
             }}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-red-500/50"
             disabled={isDepositing || isWithdrawing}
-          >
-            Sacar
-          </button>
+          ></button>
         </div>
 
         {(isDepositing || isWithdrawing) && (

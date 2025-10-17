@@ -22,8 +22,8 @@ model User {
   email        String    @unique
   passwordHash String
   name         String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  
+  updatedAt    DateTime  
   role         Role      @default(USER)
   sessions     Session[]
 }
@@ -64,7 +64,7 @@ model Transaction {
   btcValue          Decimal        @db.Decimal(18, 8)
   price_brl_per_btc Decimal         @db.Decimal(18, 2)
 
-  occurredAt DateTime @default(now())
+  occurredAt DateTime 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

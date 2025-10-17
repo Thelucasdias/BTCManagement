@@ -59,7 +59,13 @@ export default function ClientBalanceSummary({ transactions }: Props) {
     } as LocalTotals
   );
 
-  const balanceBRL = totals.depositBRL - totals.withdrawBRL;
+  if (totals.withdrawBRL > totals.depositBRL) {
+    totals.depositBRL = 0;
+    totals.withdrawBRL = 0;
+  }
+
+  const balanceBRL = Math.max(totals.depositBRL - totals.withdrawBRL, 0);
+
   const btcPriceBRL = btcPriceData ?? 0;
 
   const summary = useClientBalanceSummary({

@@ -43,8 +43,16 @@ const calculateSummary = (
     }
   );
 
-  const totalFiatBalanceCents =
-    totals.totalDepositCents - totals.totalWithdrawCents;
+  const totalFiatBalanceCents = Math.max(
+    totals.totalDepositCents - totals.totalWithdrawCents,
+    0
+  );
+
+  if (totals.totalWithdrawCents > totals.totalDepositCents) {
+    totals.totalDepositCents = 0;
+    totals.totalWithdrawCents = 0;
+  }
+
   const balanceBTC = totals.depositBTC - totals.withdrawBTC;
   const currentBalanceBRLValue = balanceBTC * btcPriceBRL;
   const currentBalanceCents = Math.round(currentBalanceBRLValue * 100);

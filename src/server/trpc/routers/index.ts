@@ -4,7 +4,7 @@ import { transactionRouter } from "./transactions";
 import { publicRouter } from "./public";
 
 export const appRouter = createTRPCRouter({
-  client: clientRouter,
+  clients: clientRouter,
   transaction: transactionRouter,
   public: publicRouter,
 });

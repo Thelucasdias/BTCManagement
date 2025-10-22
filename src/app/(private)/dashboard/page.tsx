@@ -5,14 +5,17 @@ import { signOut } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 import { useClientBalanceSummary } from "@/hooks/useClientBalance";
 import { formatCurrencyBRL, formatBtcValue } from "@/lib/money";
+import TransactionsModal from "./TransactionsModal";
 
 export default function DashboardPage() {
+  // Busca transações do cliente logado
   const {
     data: transactions,
     isLoading: loadingTransactions,
     error: transactionError,
-  } = trpc.client.getTransactions.useQuery();
+  } = trpc.clients.getTransactions.useQuery();
 
+  // Busca cotação atual do BTC
   const {
     data: btcPriceData,
     isLoading: loadingPrice,
@@ -22,6 +25,7 @@ export default function DashboardPage() {
   const isLoading = loadingTransactions || loadingPrice;
   const error = transactionError || priceError;
 
+  // Resumo de saldo e lucro/prejuízo
   const summary = useClientBalanceSummary({
     transactions: transactions,
     btcPriceBRL: btcPriceData,
@@ -38,14 +42,17 @@ export default function DashboardPage() {
   const isProfit = !isPositive;
   const profitLossLabel = isProfit ? "Lucro" : "Desvalorização";
 
-  const [isDepositing, setIsDepositing] = useState(false);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  // Estado para o modal
+  const [modalType, setModalType] = useState<"DEPOSIT" | "WITHDRAWAL" | null>(
+    null
+  );
 
+  // Tratamento de erros e carregamento
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <p className="text-xl font-bold text-red-600">
-          Error loading dashboard: {error.message}
+          Erro ao carregar o dashboard: {error.message}
         </p>
       </div>
     );
@@ -55,19 +62,20 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <p className="text-2xl font-semibold text-blue-600">
-          Loading Dashboard... ⏳
+          Carregando Dashboard...
         </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start justify-center p-4 sm:p-8">
-      <div className="w-full max-w-xl bg-white shadow-2xl rounded-xl p-6 sm:p-10 transform transition-all duration-300">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-4 sm:p-8">
+      <div className="w-full max-w-xl bg-white shadow-2xl rounded-xl p-6 sm:p-10 transition-all duration-300">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center border-b pb-3">
           Bitcoin fácil
         </h1>
 
+        {/* RESUMO */}
         <div className="space-y-6 text-center">
           <div className="text-gray-500">
             <p className="text-sm font-semibold uppercase tracking-wider">
@@ -87,7 +95,9 @@ export default function DashboardPage() {
             </p>
 
             <div
-              className={`text-lg font-bold mt-2 ${isProfit ? "text-green-600" : "text-red-600"}`}
+              className={`text-lg font-bold mt-2 ${
+                isProfit ? "text-green-600" : "text-red-600"
+              }`}
             >
               {isProfit ? "↑" : "↓"} {formatCurrencyBRL(profitLossCents)} (
               {profitLossLabel})
@@ -104,46 +114,38 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* BOTÕES DE AÇÃO */}
         <div className="flex flex-col sm:flex-row gap-4 mt-12">
           <button
-            onClick={() => {
-              setIsDepositing(true);
-              console.log("Opening deposit modal...");
-            }}
+            onClick={() => setModalType("DEPOSIT")}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-blue-500/50"
-            disabled={isDepositing || isWithdrawing}
+            disabled={modalType !== null}
           >
             Depositar
           </button>
 
           <button
-            onClick={() => {
-              setIsWithdrawing(true);
-              console.log("Opening withdrawal modal...");
-            }}
+            onClick={() => setModalType("WITHDRAWAL")}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-red-500/50"
-            disabled={isDepositing || isWithdrawing}
-          ></button>
+            disabled={modalType !== null}
+          >
+            Sacar
+          </button>
         </div>
 
-        {(isDepositing || isWithdrawing) && (
-          <div className="mt-6 p-4 bg-yellow-50 text-yellow-800 rounded-lg text-center font-medium">
-            {isDepositing
-              ? "Deposit modal open..."
-              : "Withdrawal modal open..."}
-            <button
-              onClick={() => {
-                setIsDepositing(false);
-                setIsWithdrawing(false);
-              }}
-              className="ml-4 text-blue-600 hover:text-blue-800"
-            >
-              Close
-            </button>
-          </div>
+        {/* MODAL DE TRANSAÇÕES */}
+        {modalType && (
+          <TransactionsModal
+            isOpen={true}
+            clientId={transactions?.[0]?.customerId ?? ""}
+            type={modalType}
+            onClose={() => setModalType(null)}
+          />
         )}
       </div>
-      <div>
+
+      {/* LOGOUT */}
+      <div className="mt-6">
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="px-5 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white font-medium"

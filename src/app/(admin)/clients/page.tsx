@@ -22,7 +22,7 @@ export default function ClientsPage() {
     isLoading,
     error,
     refetch,
-  } = trpc.client.listForAdmin.useQuery(
+  } = trpc.clients.listForAdmin.useQuery(
     { limit: 20 },
     {
       refetchOnWindowFocus: false,
